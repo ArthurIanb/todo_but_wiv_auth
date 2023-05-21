@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}home{% endblock title %}
+{% block body %}
+    {% if user.is_authenticated %}
+        <form method='POST' action={% url 'new_task' %}>
+            {% csrf_token %}
+            <label for='title'>Title: </label>
+            <input name='title'/>
+            <input type='submit' value='Save!'/>
+        </form>
+    {% endif %}
+    {% for task in tasks %}
+        {% if user.id == task.owner_id %}
+            <p>{{ task.title }}</p>
+            <form action={% url 'change_state' task.pk %} method='POST'>
+                {% csrf_token %}
+                {% if task.done %}
+                    <input style='color: green;' type='submit' value='Done'/>
+                {% else %}
+                    <input style='color: red;' type='submit' value='Progressing'/>
+                {% endif %}
+            </form>
+            <form action={% url 'remove_task' task.pk %} method='POST'>
+                {% csrf_token %}
+                <input style="background-color: red; color: white" type='submit' value="Remove task"/>
+            </form>
+        {% endif %}
+    {% endfor %}
+    
+{% endblock body %}
